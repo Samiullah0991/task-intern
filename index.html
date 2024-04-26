@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Finder</title>
+</head>
+<body>
+    <h1>Link Finder</h1>
+    <form id="linkForm">
+        <label for="url">Enter URL:</label><br>
+        <input type="text" id="url" name="url" required><br><br>
+        <button type="submit">Find Links</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('linkForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var url = document.getElementById('url').value;
+            fetch('/find-links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({url: url}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '';
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        var links = data[key];
+                        var ul = document.createElement('ul');
+                        for (var i = 0; i < links.length; i++) {
+                            var li = document.createElement('li');
+                            li.textContent = links[i];
+                            ul.appendChild(li);
+                        }
+                        resultDiv.appendChild(ul);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
